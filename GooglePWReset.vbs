@@ -1,7 +1,7 @@
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 ' Versions
 '
-' Version: 1.5
+' Version: 1.7
 ' source: inzi.com
 '
 ' Change Log
@@ -15,6 +15,24 @@
 ' Added 2nd tab to account for lost password link at line 109
 '
 '
+' v1.7 11/18/2014
+' Changed path to Chrome.exe to just be "chrome.exe" Full path seems to be an issue for some users
+' Increased delay for google login
+' apparently - the google login is fluxing - added commenting so people can modify the dialog navigation. 
+' Fixed the final password reset step so it tabs twice
+' Added detailed of comments so people know what it's doing
+' 
+'
+' 
+'
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'
+' When launching this, you might pipe the output to a file in case your computer turns off, so you know what the password is
+'
+
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
 
@@ -71,7 +89,9 @@ iSlowConnectionFactor = 1
 '     Click Start, type Chrome, right click Google Chrome, click Properties, copy *everything* in Target, and put it here.
 
 ' This example path is for 64 bit windows
-ChromeEXE = "C:\Program Files (x86)\Google\Chrome\Application\chrome.exe"
+' You might need the full path: ChromeEXE = "C:\Program Files (x86)\Google\Chrome\Application\chrome.exe"
+ChromeEXE = "chrome.exe"
+
 
 ' This example path is for 32 bit windows
 ' "C:\Program Files\Google\Chrome\Application\chrome.exe" 
@@ -87,11 +107,14 @@ ChromeEXE = "C:\Program Files (x86)\Google\Chrome\Application\chrome.exe"
 
 
 'Some of this code uses the AutoIT com object. See their documentation for more details.
+' https://www.autoitscript.com/site/autoit/
+' you have to install that to use this.
+
 
 oShell.Run ChromeEXE, 1, False
 
 ' Wait for the Google Chrome window to become active
-oAutoIt.WinWaitActive "New Tab - Google Chrome", ""
+oAutoIt.WinWaitActive "New Tab - Google Chrome", ""			'open chrome and wait for the window to appear
 oAutoIt.Sleep 3000
 
 WScript.Echo "Entering Loop"
@@ -102,69 +125,72 @@ For x = 1 To 99
     WScript.Echo "Step " & x
     WScript.Echo "Current PW: " & tCurPw
     tNewPW = curPW & x
-    WScript.Echo "Setting the password to: " & tNewPW
+    WScript.Echo "Setting the password to: " & tNewPW			' output the password in case it crashes the user can see what it is.
     
-    GLogin sUN, tCurPw
-    GEditPW
-    oAutoIt.Send tCurPw & "{TAB}{TAB}"
-    oAutoIt.Sleep 250 * iSlowConnectionFactor 
-    oAutoIt.Send tNewPW & "{TAB}"
-    oAutoIt.Sleep 250 * iSlowConnectionFactor 
-    oAutoIt.Send tNewPW & "{TAB}"
-    oAutoIt.Sleep 250 * iSlowConnectionFactor 
-    oAutoIt.Send "{ENTER}"
-    oAutoIt.Sleep 3000 * iSlowConnectionFactor 
+    GLogin sUN, tCurPw							' log into google with current password				
+    GEditPW								' load the edit password page, old password should have focus after it loads.
+    oAutoIt.Send tCurPw & "{TAB}{TAB}"					' enter the old (last) password and tab TWICE (once out of field, and once past password reset link)
+    oAutoIt.Sleep 250 * iSlowConnectionFactor 				' waits x ms times slow connection
+    oAutoIt.Send tNewPW & "{TAB}"					' type new password
+    oAutoIt.Sleep 250 * iSlowConnectionFactor 				' waits x ms times slow connection
+    oAutoIt.Send tNewPW & "{TAB}"					' types the new password again then tab (should highlight "change password button")
+    oAutoIt.Sleep 250 * iSlowConnectionFactor 				' waits x ms times slow connection
+    oAutoIt.Send "{ENTER}"						' Hit enter to submit the password reset.
+    oAutoIt.Sleep 3000 * iSlowConnectionFactor 				' waits x ms times slow connection
     
-    tCurPw = tNewPW
+    tCurPw = tNewPW							' updates the current password.
 
-    GLogout
+    GLogout								' logs out of google - it has to do this for password change to stick.
+
+									' At this point, the process should repeat.
+
 Next 
 
-WScript.Echo "Final Change"
-GLogin sUN, tCurPw
-GEditPW
+WScript.Echo "Final Change"						' Last time
+GLogin sUN, tCurPw							' log into google with current password.
+GEditPW									' load the edit password page
 
-oAutoIt.Send tCurPw & "{TAB}"
-oAutoIt.Sleep 250 * iSlowConnectionFactor 
-oAutoIt.Send oldPW & "{TAB}"
-oAutoIt.Sleep 250 * iSlowConnectionFactor 
-oAutoIt.Send oldPW & "{TAB}"
-oAutoIt.Sleep 250 * iSlowConnectionFactor 
-oAutoIt.Send "{ENTER}"
-oAutoIt.Send "https://www.google.com/accounts/Logout{ENTER}"
-oAutoIt.Sleep 2000 * iSlowConnectionFactor 
+oAutoIt.Send tCurPw & "{TAB}{TAB}"					' enter the old (last) password and tab TWICE (once out of field, and once past password reset link)			
+oAutoIt.Sleep 250 * iSlowConnectionFactor 				' waits x ms times slow connection
+oAutoIt.Send oldPW & "{TAB}"						' enter the password, used password and hit tab
+oAutoIt.Sleep 250 * iSlowConnectionFactor				' waits x ms times slow connection
+oAutoIt.Send oldPW & "{TAB}"						' enter the password, used password and hit tab
+oAutoIt.Sleep 250 * iSlowConnectionFactor 				' waits x ms times slow connection
+oAutoIt.Send "{ENTER}"							' Submit the password reset
+oAutoIt.Send "https://www.google.com/accounts/Logout{ENTER}"		' Log out to make the password stick
+oAutoIt.Sleep 2000 * iSlowConnectionFactor 				' waits x ms times slow connection
 WScript.Echo "Password reset"
-
-
-
 
 WScript.Quit
 
+' Script complete.
+
+
 Function GLogin(un, pw) ' Opens the Google Login page, enters the supplied Username (un) and Password (pw), and presses Enter.
     WScript.Echo "Logging in: " & un & ", " & pw
-    oAutoIt.Send "!d"
-    oAutoIt.Sleep 250 * iSlowConnectionFactor 
-    oAutoIt.Send "https://accounts.google.com/Login{ENTER}"
-    oAutoIt.Sleep 2000 * iSlowConnectionFactor 
-    oAutoIt.Send un & "{TAB}"
-    oAutoIt.Sleep 250 * iSlowConnectionFactor 
-    oAutoIt.Send pw & "{ENTER}"
-    oAutoIt.Sleep 3000 * iSlowConnectionFactor 
+    oAutoIt.Send "!d"							' This goes to the address bar
+    oAutoIt.Sleep 250 * iSlowConnectionFactor 				' waits x ms times slow connection
+    oAutoIt.Send "https://accounts.google.com/Login{ENTER}"		' types this url and hits enter. Upon load, email field should have focus
+    oAutoIt.Sleep 2000 * iSlowConnectionFactor 				' waits x ms times slow connection
+    oAutoIt.Send un & "{TAB}"						' types username and hits tab
+    oAutoIt.Sleep 250 * iSlowConnectionFactor 				' waits x ms times slow connection
+    oAutoIt.Send pw & "{ENTER}"						' types password and hits enter
+    oAutoIt.Sleep 5000 * iSlowConnectionFactor 				' waits x ms times slow connection.
 
 End Function
 
 Function GEditPW() ' Opens the Google Change Password web page
-    oAutoIt.Send "!d"
-    oAutoIt.Sleep 250 * iSlowConnectionFactor 
-    oAutoIt.Send "https://accounts.google.com/b/0/EditPasswd{ENTER}"
-    oAutoIt.Sleep 2000 * iSlowConnectionFactor 
+    oAutoIt.Send "!d"							' go to address bar
+    oAutoIt.Sleep 250 * iSlowConnectionFactor 				' waits x ms times slow connection
+    oAutoIt.Send "https://accounts.google.com/b/0/EditPasswd{ENTER}"	' go the edit password page
+    oAutoIt.Sleep 4000 * iSlowConnectionFactor 				' waits x ms times slow connection
 End Function
 
 Function GLogout() ' Logs out from google. This is necessary for the password change to take effect. Trust me, I tried to do it without logging out. No luck.
     WScript.Echo "Logging out"
-    oAutoIt.Send "!d"
-    oAutoIt.Sleep 250 * iSlowConnectionFactor 
-    oAutoIt.Send "https://www.google.com/accounts/Logout{ENTER}"
-    oAutoIt.Sleep 3000 * iSlowConnectionFactor 
+    oAutoIt.Send "!d"							' this goes to the address bar
+    oAutoIt.Sleep 250 * iSlowConnectionFactor 				' waits x ms times slow connection
+    oAutoIt.Send "https://www.google.com/accounts/Logout{ENTER}"	' This logs out of google. 
+    oAutoIt.Sleep 5000 * iSlowConnectionFactor 				' waits x ms times slow connection
 
 End Function
