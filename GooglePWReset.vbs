@@ -1,7 +1,7 @@
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 ' Versions
 '
-' Version: 1.8
+' Version: 1.8.1
 ' source: inzi.com
 '
 ' Change Log
@@ -26,7 +26,10 @@
 ' v1.8 11/18/2014
 ' change the login URL so that the email field is editable on each login
 ' 
+' v1.8.1 11/18/2014
+' Bug - left out a quote
 '
+
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
 
@@ -173,7 +176,7 @@ Function GLogin(un, pw) ' Opens the Google Login page, enters the supplied Usern
     oAutoIt.Send "!d"							' This goes to the address bar
     oAutoIt.Sleep 250 * iSlowConnectionFactor 				' waits x ms times slow connection
     'oAutoIt.Send "https://accounts.google.com/Login{ENTER}"		' types this url and hits enter. Upon load, email field should have focus
-    oAutoIt.Send https://accounts.google.com/ServiceLogin?Email=%22%22{ENTER}" ' types this url and hits enter. Upon load, email field should have focus. Email param makes it empty.
+    oAutoIt.Send "https://accounts.google.com/ServiceLogin?Email=%22%22{ENTER}" ' types this url and hits enter. Upon load, email field should have focus. Email param makes it empty.
     oAutoIt.Sleep 2000 * iSlowConnectionFactor 				' waits x ms times slow connection
     oAutoIt.Send un & "{TAB}"						' types username and hits tab
     oAutoIt.Sleep 250 * iSlowConnectionFactor 				' waits x ms times slow connection
