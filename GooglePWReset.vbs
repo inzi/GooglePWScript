@@ -1,7 +1,7 @@
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 ' Versions
 '
-' Version: 1.7
+' Version: 1.8
 ' source: inzi.com
 '
 ' Change Log
@@ -23,6 +23,8 @@
 ' Added detailed of comments so people know what it's doing
 ' 
 '
+' v1.8 11/18/2014
+' change the login URL so that the email field is editable on each login
 ' 
 '
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -170,7 +172,8 @@ Function GLogin(un, pw) ' Opens the Google Login page, enters the supplied Usern
     WScript.Echo "Logging in: " & un & ", " & pw
     oAutoIt.Send "!d"							' This goes to the address bar
     oAutoIt.Sleep 250 * iSlowConnectionFactor 				' waits x ms times slow connection
-    oAutoIt.Send "https://accounts.google.com/Login{ENTER}"		' types this url and hits enter. Upon load, email field should have focus
+    'oAutoIt.Send "https://accounts.google.com/Login{ENTER}"		' types this url and hits enter. Upon load, email field should have focus
+    oAutoIt.Send https://accounts.google.com/ServiceLogin?Email=%22%22{ENTER}" ' types this url and hits enter. Upon load, email field should have focus. Email param makes it empty.
     oAutoIt.Sleep 2000 * iSlowConnectionFactor 				' waits x ms times slow connection
     oAutoIt.Send un & "{TAB}"						' types username and hits tab
     oAutoIt.Sleep 250 * iSlowConnectionFactor 				' waits x ms times slow connection
