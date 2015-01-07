@@ -1,7 +1,7 @@
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 ' Versions
 '
-' Version: 1.8.1
+' Version: 1.8.2
 ' source: inzi.com
 '
 ' Change Log
@@ -28,6 +28,9 @@
 ' 
 ' v1.8.1 11/18/2014
 ' Bug - left out a quote
+'
+' v1.8.2 01/07/2015
+' Bug - Removed unnecessary quotes on line oAutoIt.Send
 '
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -162,8 +165,7 @@ oAutoIt.Sleep 250 * iSlowConnectionFactor				' waits x ms times slow connection
 oAutoIt.Send oldPW & "{TAB}"						' enter the password, used password and hit tab
 oAutoIt.Sleep 250 * iSlowConnectionFactor 				' waits x ms times slow connection
 oAutoIt.Send "{ENTER}"							' Submit the password reset
-oAutoIt.Send "https://www.google.com/accounts/Logout{ENTER}"		' Log out to make the password stick
-oAutoIt.Sleep 2000 * iSlowConnectionFactor 				' waits x ms times slow connection
+GLogout									' logs out of google - it has to do this for password change to stick.
 WScript.Echo "Password reset"
 
 WScript.Quit
@@ -176,7 +178,7 @@ Function GLogin(un, pw) ' Opens the Google Login page, enters the supplied Usern
     oAutoIt.Send "!d"							' This goes to the address bar
     oAutoIt.Sleep 250 * iSlowConnectionFactor 				' waits x ms times slow connection
     'oAutoIt.Send "https://accounts.google.com/Login{ENTER}"		' types this url and hits enter. Upon load, email field should have focus
-    oAutoIt.Send "https://accounts.google.com/ServiceLogin?Email=%22%22{ENTER}" ' types this url and hits enter. Upon load, email field should have focus. Email param makes it empty.
+    oAutoIt.Send "https://accounts.google.com/ServiceLogin?Email={ENTER}" ' types this url and hits enter. Upon load, email field should have focus. Email param makes it empty.
     oAutoIt.Sleep 2000 * iSlowConnectionFactor 				' waits x ms times slow connection
     oAutoIt.Send un & "{TAB}"						' types username and hits tab
     oAutoIt.Sleep 250 * iSlowConnectionFactor 				' waits x ms times slow connection
