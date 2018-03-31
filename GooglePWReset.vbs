@@ -133,15 +133,14 @@ For x = 1 To 99
     WScript.Echo "Setting the password to: " & tNewPW			' output the password in case it crashes the user can see what it is.
     
     GLogin sUN, tCurPw							' log into google with current password				
-    GEditPW								' load the edit password page, old password should have focus after it loads.
-    oAutoIt.Send tCurPw & "{TAB}{TAB}"					' enter the old (last) password and tab TWICE (once out of field, and once past password reset link)
+    GEditPW	tCurPw							' load the edit password page, old password should have focus after it loads.
+    
+	oAutoIt.Send tNewPW & "{TAB}{TAB}{TAB}"					' enter the old (last) password and tab TWICE (once out of field, and once past password reset link)
     oAutoIt.Sleep 250 * iSlowConnectionFactor 				' waits x ms times slow connection
-    oAutoIt.Send tNewPW & "{TAB}"					' type new password
-    oAutoIt.Sleep 250 * iSlowConnectionFactor 				' waits x ms times slow connection
-    oAutoIt.Send tNewPW & "{TAB}"					' types the new password again then tab (should highlight "change password button")
+    oAutoIt.Send tNewPW					' type new password
     oAutoIt.Sleep 250 * iSlowConnectionFactor 				' waits x ms times slow connection
     oAutoIt.Send "{ENTER}"						' Hit enter to submit the password reset.
-    oAutoIt.Sleep 3000 * iSlowConnectionFactor 				' waits x ms times slow connection
+    oAutoIt.Sleep 2000 * iSlowConnectionFactor 				' waits x ms times slow connection
     
     tCurPw = tNewPW							' updates the current password.
 
@@ -152,18 +151,17 @@ For x = 1 To 99
 Next 
 
 WScript.Echo "Final Change"						' Last time
-GLogin sUN, tCurPw							' log into google with current password.
-GEditPW									' load the edit password page
 
-oAutoIt.Send tCurPw & "{TAB}{TAB}"					' enter the old (last) password and tab TWICE (once out of field, and once past password reset link)			
+GLogin sUN, tCurPw							' log into google with current password.
+GEditPW	tCurPw								' load the edit password page
+
+oAutoIt.Send tCurPw & "{TAB}{TAB}{TAB}"					' enter the old (last) password and tab TWICE (once out of field, and once past password reset link)			
 oAutoIt.Sleep 250 * iSlowConnectionFactor 				' waits x ms times slow connection
-oAutoIt.Send oldPW & "{TAB}"						' enter the password, used password and hit tab
+oAutoIt.Send oldPW						' enter the password, used password and hit tab
 oAutoIt.Sleep 250 * iSlowConnectionFactor				' waits x ms times slow connection
-oAutoIt.Send oldPW & "{TAB}"						' enter the password, used password and hit tab
-oAutoIt.Sleep 250 * iSlowConnectionFactor 				' waits x ms times slow connection
 oAutoIt.Send "{ENTER}"							' Submit the password reset
-oAutoIt.Send "https://www.google.com/accounts/Logout{ENTER}"		' Log out to make the password stick
 oAutoIt.Sleep 2000 * iSlowConnectionFactor 				' waits x ms times slow connection
+GLogout                              		' Log out to make the password stick
 WScript.Echo "Password reset"
 
 WScript.Quit
@@ -175,20 +173,21 @@ Function GLogin(un, pw) ' Opens the Google Login page, enters the supplied Usern
     WScript.Echo "Logging in: " & un & ", " & pw
     oAutoIt.Send "!d"							' This goes to the address bar
     oAutoIt.Sleep 250 * iSlowConnectionFactor 				' waits x ms times slow connection
-    'oAutoIt.Send "https://accounts.google.com/Login{ENTER}"		' types this url and hits enter. Upon load, email field should have focus
-    oAutoIt.Send "https://accounts.google.com/ServiceLogin?Email=%22%22{ENTER}" ' types this url and hits enter. Upon load, email field should have focus. Email param makes it empty.
+    oAutoIt.Send "https://accounts.google.com/ServiceLogin?Email=" & un & "{ENTER}"' types this url and hits enter. Upon load, email field should have focus. Email param makes it empty.
     oAutoIt.Sleep 2000 * iSlowConnectionFactor 				' waits x ms times slow connection
-    oAutoIt.Send un & "{TAB}"						' types username and hits tab
-    oAutoIt.Sleep 250 * iSlowConnectionFactor 				' waits x ms times slow connection
-    oAutoIt.Send pw & "{ENTER}"						' types password and hits enter
+	oAutoIt.Send "{ENTER}"
+	oAutoIt.Sleep 2000 * iSlowConnectionFactor 				' waits x ms times slow connection
+	oAutoIt.Send pw & "{ENTER}"						' types password and hits enter
     oAutoIt.Sleep 5000 * iSlowConnectionFactor 				' waits x ms times slow connection.
 
 End Function
 
-Function GEditPW() ' Opens the Google Change Password web page
+Function GEditPW(pw) ' Opens the Google Change Password web page
     oAutoIt.Send "!d"							' go to address bar
     oAutoIt.Sleep 250 * iSlowConnectionFactor 				' waits x ms times slow connection
     oAutoIt.Send "https://accounts.google.com/b/0/EditPasswd{ENTER}"	' go the edit password page
+	oAutoIt.Sleep 2000 * iSlowConnectionFactor 				' waits x ms times slow connection
+	oAutoIt.Send pw & "{ENTER}"						' types password and hits enter
     oAutoIt.Sleep 4000 * iSlowConnectionFactor 				' waits x ms times slow connection
 End Function
 
